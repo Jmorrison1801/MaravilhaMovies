@@ -1,0 +1,11 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <div id="homepage-div">
+        <fieldset id="homepage-fieldset">
+        <form id="homepage-form" action="{{ search_action }}" method="post">
+            <input id="search_movie" name="search_movie" type="text" value="Enter Movie Name" size="30" maxlength="50">
+            <input type="submit" value="Search" id="search_btn">
+        </form>
+        </fieldset>
+    </div>
+{% endblock %}

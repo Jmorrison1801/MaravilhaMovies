@@ -1,0 +1,15 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <div id="page-content-div">
+        <h1>Account Overview</h1>
+    </div>
+    <body>
+        <ul>
+            <li><a href="{{ view_information }}"> View Account Information</a></li>
+            <li><a href="{{ acc_preferences }}"> Account Preferences</a></li>
+        </ul>
+        <form action="{{ logout_action }}" method="post">
+            <input type="submit" value="Log Out">
+        </form>
+    </body>
+{% endblock %}

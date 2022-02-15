@@ -1,0 +1,16 @@
+{% extends 'layout.html.twig' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block banner %}
+<div id="account-div">
+    <h1>{{ page_heading_1 }}</h1>
+    <hr class="deepline"/>
+    <nav id="banner-nav">
+        <a href="{{ login_button }}">{{ login_value }}</a>
+        <a href={{ homepage }}>Homepage</a>
+        <a href="#">Recent Releases</a>
+        <a href="#">Most Popular</a>
+        <a href="#">About</a>
+    </nav>
+</div>
+<div id="clear-div"></div>
+{% endblock %}

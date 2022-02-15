@@ -1,0 +1,19 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <div id="accInfo-div">
+        <h1>Account Information</h1>
+        <fieldset>
+            <ul>
+                <li>Email: {{ email }}</li>
+            </ul>
+            <br>
+            <ul>
+                <li><a href="{{ change_email }}"> Change Email</a></li>
+                <li><a href="{{ change_password }}"> Change Password</a></li>
+            </ul>
+        </fieldset>
+        <form action="{{ account_overview }}" method="post">
+            <input type="submit" value="Account Overview">
+        </form>
+    </div>
+{% endblock %}

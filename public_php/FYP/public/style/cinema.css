@@ -1,0 +1,124 @@
+body {
+    background-color: #ffffff;
+    font-size: 20px;
+    font-family: sans-serif;
+}
+/*****************************
+ Banner Style
+ *****************************/
+#banner-nav a {
+    background-color: #722db4;
+    color: #FFFFFF;
+    padding:  1em;
+    margin: 0.25em;
+    min-height: 1vw;
+    min-width: 10vw;
+    transition: background-color 0.7s;
+    text-decoration: none;
+    width: auto;
+    height: auto;
+    font-size: 20px;
+    display: inline-flex;
+    alignment: center;
+    text-align-all: center;
+
+}
+
+#banner-nav a:hover {
+    background-color: #BE68E6;
+}
+
+/*****************************
+ Homepage Style
+ *****************************/
+#homepage-form{
+    padding:  0.25em;
+    margin: 0.25em;
+    transition: background-color 0.7s;
+    text-decoration: none;
+    width: auto;
+    font-size: 20px;
+}
+
+#homepage-fieldset{
+
+}
+
+#search_btn{
+    background-color: #722db4;
+    color: #FFFFFF;
+    padding:  0.5em;
+    margin: 0.25em;
+    transition: background-color 0.7s;
+    text-decoration: none;
+    width: auto;
+    height: auto;
+    font-size: 20px;
+    display: inline-block;
+    alignment: center;
+}
+
+#search_btn:hover {
+    background-color: #BE68E6;
+}
+
+#search_movie{
+    padding:  0.25em;
+    margin: 0.25em;
+    transition: background-color 0.7s;
+    text-decoration: none;
+    font-size: 20px;
+    display: inline-block;
+    alignment: center;
+}
+
+#homepage-fieldset{
+
+}
+
+/*****************************
+ Login and Register Style
+ *****************************/
+
+#login_btn{
+    background-color: #722db4;
+    color: #FFFFFF;
+    padding:  0.5em;
+    margin: 0.25em;
+    transition: background-color 0.7s;
+    text-decoration: none;
+    width: auto;
+    height: auto;
+    font-size: 20px;
+    display: inline-block;
+    alignment: center;
+}
+
+#login_btn:hover {
+    background-color: #BE68E6;
+}
+
+#register_btn{
+    background-color: #722db4;
+    color: #FFFFFF;
+    padding:  0.5em;
+    margin: 0.25em;
+    transition: background-color 0.7s;
+    text-decoration: none;
+    width: auto;
+    height: auto;
+    font-size: 20px;
+    display: inline-block;
+    alignment: center;
+}
+
+#register_btn:hover {
+    background-color: #BE68E6;
+}
+
+
+
+
+
+
+

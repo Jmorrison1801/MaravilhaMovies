@@ -1,0 +1,29 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <div id="register-div">
+        <form action="{{ register_action_2 }}" method="post">
+            <fieldset>
+                <legend>Enter Email Address</legend>
+                <input id="emailAddress" name = "Enter Email Address" type="text" value="{{ email_value }}" size="30" maxlength="50">
+                <br>
+                <br>
+                <legend>Enter Password</legend>
+                <input id="createPassword" name = "Enter Password" type="password" value="{{ password_value_1 }}" size="30" maxlength="20">
+                <br>
+                <br>
+                <legend>Confirm Password</legend>
+                <input id="confirmPassword" name = "Confirm Password" type="password" value="{{ password_value_2 }}" size="30" maxlength="20">
+                <br>
+                <br>
+                <input type="submit" value="Create Account" id="register_btn">
+                <br>
+            </fieldset>
+        </form>
+        <br>
+        <form action="{{ login_action_2 }}" method="post">
+            <input type="submit" value="Have an Account?" id="register_btn">
+        </form>
+        <br>
+        <legend>{{ error }}</legend>
+    </div>
+{% endblock %}
