@@ -6,11 +6,17 @@
     <hr class="deepline"/>
     <nav id="banner-nav">
         <a href="{{ login_button }}">{{ login_value }}</a>
-        <a href={{ homepage }}>Homepage</a>
+        <a href="{{ homepage }}">Homepage</a>
+        <a href="{{ advance_action }}">Advance Search</a>
         <a href="#">Recent Releases</a>
-        <a href="#">Most Popular</a>
         <a href="#">About</a>
     </nav>
+    <fieldset id="homepage-fieldset">
+        <form id="homepage-form" action="{{ search_action }}" method="post">
+            <input id="search_movie" name="search_movie" type="text" value="Enter Movie Name" size="30" maxlength="50">
+            <input type="submit" value="Search" id="search_btn">
+        </form>
+    </fieldset>
 </div>
 <div id="clear-div"></div>
 {% endblock %}

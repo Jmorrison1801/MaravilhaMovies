@@ -21,4 +21,4 @@ require $app_path . 'routes.php';
 
 $app->run();
 
-session_regenerate_id(true);
+//session_regenerate_id(true);

@@ -15,6 +15,7 @@ $app->map(['post','get'],'/register', function (Request $request, Response $resp
             'login_button' => 'login',
             'login_value' => 'Login',
             'homepage' =>  $_SERVER["SCRIPT_NAME"] ,
+            'search_action' => 'searchResults',
             'page_title' => 'Maravilha Movies',
             'page_heading_1' => 'Maravilha Movies',
             'page_heading_2' => 'Register',

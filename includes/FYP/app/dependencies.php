@@ -46,3 +46,13 @@ $container['BcryptWrapper'] = function($container){
     $model = new \MaravilhaMovies\BcryptWrapper();
     return $model;
 };
+
+$container['MovieManager'] = function($container){
+    $model = new \MaravilhaMovies\MovieManager();
+    return $model;
+};
+
+$container['MovieCollection'] = function($container){
+    $model = new \MaravilhaMovies\MovieCollection();
+    return $model;
+};

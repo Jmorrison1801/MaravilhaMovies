@@ -1,0 +1,41 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <div>
+        <form id="advanced_search" action="{{ adv_search }}" method="post">
+        <label for="genres">Choose a genre:</label>
+        <select name="genre" id="genres">
+            <option value="Any">Any</option>
+            <option value="Action">Action</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Romance">Romance</option>
+            <option value="Superhero">Superhero</option>
+            <option value="Sci-fi">Sci-fi</option>
+            <option value="Animation">Animation</option>
+        </select>
+            <br>
+            <input name="min-date" type="date" value="min date" id="date" placeholder="search term" aria-label="search">
+            <input name="max-date" type="date" value=" max date" id="date" placeholder="search term" aria-label="search">
+            <br>
+            <label for="cast">Enter Cast Member: </label>
+            <input id="cast" name="cast" type="text" size="30" maxlength="50">
+            <br>
+            <label for="director">Enter Director Name: </label>
+            <input id="director" name="director" type="text" size="30" maxlength="50">
+            <br>
+            <label for="ageRating">Choose a Age Rating:</label>
+            <select name="ageRating" id="ageRating">
+                <option value="Any">Any</option>
+                <option value="PG-13">PG-13</option>
+                <option value="Uc">Uc</option>
+                <option value="12">12</option>
+                <option value="12A">12A</option>
+                <option value="15">15</option>
+                <option value="18">18</option>
+                <option value="R18">R18</option>
+            </select>
+            <br>
+            <input type="submit" value="Search" id="search_btn">
+        </form>
+    </div>
+{% endblock %}

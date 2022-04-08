@@ -9,6 +9,7 @@ $app->map(['post','get'],'/', function (Request $request, Response $response) us
     $session_wrapper = $app->getContainer()->get('SessionWrapper');
     $values = $session_wrapper->getSessionVar('email');
 
+
     if($values == null)
     {
         $values = $account_manager->AccountCheck(false);
@@ -23,7 +24,8 @@ $app->map(['post','get'],'/', function (Request $request, Response $response) us
            'landing_page' => $_SERVER["SCRIPT_NAME"],
            'login_button' => $values['action'],
            'login_value' => $values['value'],
-           'search' => '',
+           'search_action' => 'searchResults',
+           'advance_action' => 'advanceSearch',
            'page_title' => 'Maravilha Movies',
            'page_heading_1' => 'Maravilha Movies',
            'page_heading_2' => 'Search for movie',
@@ -31,4 +33,10 @@ $app->map(['post','get'],'/', function (Request $request, Response $response) us
        ]
    );
 })->setName('homepage');
+
+function getMovies($app)
+{
+
+}
+
 

@@ -15,10 +15,12 @@ class SessionWrapper
         if (!empty($session_value_to_set))
         {
             $_SESSION[$session_key] = $session_value_to_set;
+            /*
             if (strcmp($_SESSION[$session_key], $session_value_to_set) == 0)
             {
                 $session_value_set_successfully = true;
             }
+            */
         }
         return $session_value_set_successfully;
     }

@@ -17,6 +17,7 @@ $app->map(['post','get'],'/viewAccount', function (Request $request, Response $r
             'acc_preferences' => 'accPreferences',
             'logout_action' => 'logout',
             'homepage' =>  $_SERVER["SCRIPT_NAME"] ,
+            'search_action' => 'searchResults',
             'page_title' => 'Maravilha Movies',
             'page_heading_1' => 'Maravilha Movies',
             'page_heading_2' => 'Search for movie',

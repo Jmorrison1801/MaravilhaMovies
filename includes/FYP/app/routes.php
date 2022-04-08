@@ -9,3 +9,6 @@ require 'routes/account/viewAccount.php';
 require 'routes/account/logout.php';
 require 'routes/account/viewInformation.php';
 require 'routes/account/accPreferences.php';
+require 'routes/searchResults.php';
+require 'routes/movieView.php';
+require 'routes/advanceSearch.php';

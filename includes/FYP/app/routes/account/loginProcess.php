@@ -9,7 +9,7 @@ $app->map(['post','get'],'/loginProcess', function (Request $request, Response $
     $tainted_param = $request->getParsedBody();
     $loginError = checkLogin($tainted_param['Enter_Email_Address'], $tainted_param['Enter_Password'], $app);
 
-    if($loginError == true)
+    if ($loginError == true)
     {
         return $response->withRedirect('login');
     }
@@ -41,7 +41,7 @@ function checkLogin($email, $password, $app)
 
     $result = $database_wrapper->getResult();
 
-    if($result == true)
+    if ($result == true)
     {
         $login_check = $bcrypt_wrapper->authenticatePassword($password, $result['password']);
         if($login_check == true)
@@ -49,6 +49,10 @@ function checkLogin($email, $password, $app)
             $session_wrapper = $app->getContainer()->get('SessionWrapper');
             $session_model = $app->getContainer()->get('SessionModel');
 
+            $results = $session_model->selectMovieInDatabase($app, $email);
+            $session_value = explode(",",$results);
+
+            $session_model->setSessionMovie($session_value);
             $session_model->setSessionEmail($email);
             $session_model->setSessionPassword($password);
             $session_model->setSessionWrapperFile($session_wrapper);
@@ -56,7 +60,7 @@ function checkLogin($email, $password, $app)
             $session_model->storeDataInSessionFile();
             $error = false;
         }
-        if($login_check == false)
+        if ($login_check == false)
         {
             $error = true;
         }

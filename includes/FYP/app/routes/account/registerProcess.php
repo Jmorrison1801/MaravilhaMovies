@@ -14,7 +14,7 @@ $app->map(['post','get'],'/registerProcess', function (Request $request, Respons
     $pwChk = $validate->getEmailchk();
     $emailChk = $validate->getPasswordchk();
 
-    if($emailChk == true && $pwChk == true){
+    if ($emailChk == true && $pwChk == true){
         $AccountPW = $validate->getPassword();
         $AccountEmail = $validate->getEmail();
 

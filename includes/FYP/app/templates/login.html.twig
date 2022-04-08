@@ -1,28 +1,28 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
     <div id="login-div">
-        <h3>{{ page_heading_2 }}</h3>
-        <form action="{{ login_action }}" method="post">
-            <fieldset>
-                <legend>Enter Email Address</legend>
-                <input id="emailAddress" name = "Enter Email Address" type="text" value="{{ email_value }}" size="30" maxlength="50">
-                <br>
-                <br>
-                <legend>Enter Password</legend>
-                <input id="enterPassword" name = "Enter Password" type="password" value="{{ password_value }}" size="30" maxlength="100">
-                <br>
-                <br>
-                <input type="submit" value="Login" id="login_btn">
-                <br>
-            </fieldset>
-        </form>
-        <br>
-        <legend>Haven't got an Account?</legend>
-        <br>
-        <form action="{{ register_action }}" method="post">
-                <input type="submit" value="Register" id="login_btn">
-        </form>
-        <br>
-        <legend>{{ error }}</legend>
+            <h3>{{ page_heading_2 }}</h3>
+            <form action="{{ login_action }}" method="post">
+                <fieldset>
+                    <legend>Enter Email Address</legend>
+                    <input id="emailAddress" name = "Enter_Email_Address" type="text" value="{{ email_value }}" size="30" maxlength="50">
+                    <br>
+                    <br>
+                    <legend>Enter Password</legend>
+                    <input id="enterPassword" name = "Enter_Password" type="password" value="{{ password_value }}" size="30" maxlength="100">
+                    <br>
+                    <br>
+                    <input type="submit" value="Login" id="login_btn">
+                    <br>
+                </fieldset>
+            </form>
+            <br>
+            <legend>Haven't got an Account?</legend>
+            <br>
+            <form action="{{ register_action }}" method="post">
+                    <input type="submit" value="Register" id="login_btn">
+            </form>
+            <br>
+            <legend>{{ error }}</legend>
     </div>
 {% endblock %}
