@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+body {
+    font-family: "Nunito", sans-serif;
+}
+
+nav {
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    margin-bottom: 1em;
+    background-color: #fb8332;
+    font-family: "Nunito", sans-serif;
+    width: auto;
+    display: flex;
+    flex-direction: row;
+}
+
+nav a {
+    align-items: center;
+    background-clip: padding-box;
+    background-color: #fa6400;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 1.25;
+    margin: 0;
+    min-height: 3rem;
+    padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+    position: relative;
+    text-decoration: none;
+    transition: all 250ms;
+    vertical-align: baseline;
+    width: 100%;
+}
+
+nav a:hover {
+    background-color: #fb8332;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+#search-title-form {
+    padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+}
+
+#search-title {
+    width: auto;
+    border: 3px solid #fa6400;
+    padding: 5px;
+    height: 20px;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+
+#film_id {
+    visibility: hidden;
+}
+
+#search_results {
+    margin-top: 1em;
+    padding: 0.25em;
+    background-color: #DEDAC9;
+    border: 3px solid;
+    border-radius: .25rem;
+    float: left;
+    width: 99%;
+}
+
+#view_btn {
+    align-items: center;
+    background-clip: padding-box;
+    background-color: #fa6400;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 1.25;
+    margin: 0;
+    min-height: 3rem;
+    padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+    position: relative;
+    text-decoration: none;
+    transition: all 250ms;
+    vertical-align: baseline;
+    width: auto;
+    display: flex;
+    float: right;
+}
+
+#advance_search_section {
+    margin-top: 1em;
+    padding: 0.25em;
+    background-color: #DEDAC9;
+    border: 3px solid;
+    border-radius: .25rem;
+    float: left;
+    width: 99%;
+}
+
+div.slide-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+
+}
+
+.image {
+    transition: all 250ms;
+}
+
+.image:hover {
+    opacity: 0.3;
+}
+
+.slider_form {
+    display: inline;
+}

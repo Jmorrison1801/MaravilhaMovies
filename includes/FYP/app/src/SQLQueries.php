@@ -28,13 +28,6 @@ class SQLQueries
 
         return $query_string;
 
-        /*
-        $query_string = "SELECT * FROM customertbl ";
-        $query_string .= "WHERE email = :email AND ";
-        $query_string .= "password = :password";
-
-        return $query_string;
-         */
     }
 
     public static function updateViewedMoviesVar()
@@ -72,6 +65,15 @@ class SQLQueries
         $query_string .= "WHERE film_id = :film_id";
 
         return $query_string;
+    }
+
+    public static function selectRecentReleaseVar()
+    {
+        $query_string = "SELECT * FROM films_tbl ";
+        $query_string .= "WHERE releaseDate < :releaseDate";
+
+        return $query_string;
+
     }
 
     /***************************

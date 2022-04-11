@@ -122,6 +122,17 @@ class DatabaseWrapper
     /***************************
     Movie Database Management
      ***************************/
+    public function selectRecentRelease($releaseDate)
+    {
+        $query_string = $this->sql_queries->selectRecentReleaseVar();
+
+        $query_parameters = [
+            ':releaseDate' => $releaseDate
+        ];
+
+
+        $this->safeMovieSelect($query_string, $query_parameters);
+    }
 
     public function selectMovie($title)
     {

@@ -23,12 +23,11 @@ $app->map(['post','get'],'/movieView', function (Request $request, Response $res
 
     getDistinctLocations($app, $tainted_param);
 
-
-    if (sizeof($tainted_param) > 1)
+    if (array_key_exists("location",$tainted_param))
     {
         getShowtimes($app, $tainted_param);
     }
-    if (sizeof($tainted_param) == 1)
+    else
     {
         addMovieToSession($app,$tainted_param['film_id']);
         storeSessionInDatabase($app);
@@ -163,7 +162,6 @@ function addMovieToSession($app,$film_id)
 
         $session_model->storeMovieInSessionFile();
         $values = $session_wrapper->getSessionVar('movie');
-        var_dump($values);
         $error = false;
     }
 
@@ -177,7 +175,6 @@ function addMovieToSession($app,$film_id)
 
         $session_model->storeMovieInSessionFile();
         $values = $session_wrapper->getSessionVar('movie');
-        var_dump($values);
         $error = false;
     }
 }

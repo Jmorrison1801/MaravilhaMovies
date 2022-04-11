@@ -61,25 +61,7 @@ function advanceSearch($app, $tainted_param)
     $movieManager = $app->getContainer()->get('MovieManager');
     $results = $movieManager->advanceSearch($app, $tainted_param);
 
-    $result = "";
+    $result = $movieManager->displaySearchResults($results);
 
-    foreach ($results as $value)
-    {
-
-        $result .= "
-<fieldset id='search_results'>
-<form action='movieView' method='POST'>
-<h1>{$value['title']}</h1>
-<input type='text' name='film_id' id='film_id' readonly value={$value['film_id']}>
-<br>
-<img id='search_image' src={$value['imageURL']} width='500' height='600'>
-<br>
-<input id='view_btn' type='submit' value='View'>
-</form>
-</fieldset>";
-
-    }
     print($result);
-    return $results;
-
 }

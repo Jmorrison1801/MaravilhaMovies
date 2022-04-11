@@ -17,6 +17,15 @@ $app->map(['post','get'],'/', function (Request $request, Response $response) us
         $values = $account_manager->AccountCheck(true);
     }
 
+    $movies = $session_wrapper->getSessionVar('movie');
+
+    if($movies != null)
+    {
+       getMovies($app);
+    }
+
+    getRecentMovies($app);
+
    return $this->view->render($response,
        'homepage.html.twig',
        [
@@ -36,7 +45,16 @@ $app->map(['post','get'],'/', function (Request $request, Response $response) us
 
 function getMovies($app)
 {
+    $movie_manager = $app->getContainer()->get('MovieManager');
+    $results = $movie_manager->sessionMovies($app);
+    print($results);
+}
 
+function getRecentMovies($app)
+{
+    $movie_manager = $app->getContainer()->get('MovieManager');
+    $results = $movie_manager->recentReleases($app);
+    print($results);
 }
 
 

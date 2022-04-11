@@ -39,6 +39,142 @@ class MovieManager
         $this->metaphone = $metaphone;
     }
 
+    public function displaySearchResults($collection)
+    {
+        $result = "
+<h1>Search Results...</h1>
+";
+        foreach ($collection as $value)
+        {
+            $result .= "
+<section id='search_results'>
+<h1>{$value['title']}</h1>
+<form action='movieView' method='POST'>
+<input type='image' id='search_image' src={$value['imageURL']} width='300' height='450'>
+<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
+</form>
+</section>";
+        }
+        return $result;
+    }
+
+
+    public function displayMoviesSession($collection)
+    {
+        $result = "
+<h1>Movies you may like...</h1>
+<div class='slide-container'>
+";
+        foreach ($collection as $value)
+        {
+            $result .= "
+<form class='slider_form' action='movieView' method='POST'>
+<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
+<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
+</form>
+";
+        }
+        $result .= "
+</div>";
+
+        return $result;
+    }
+
+    public function displayRecentMovies($collection)
+    {
+        $result = "
+<h1>Recent Releases...</h1>
+<div class='slide-container'>
+";
+        foreach ($collection as $value)
+        {
+            $result .= "
+<form class='slider_form' action='movieView' method='POST'>
+<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
+<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
+</form>
+";
+        }
+        $result .= "
+</div>";
+
+        return $result;
+    }
+
+
+    public function displayMovies($collection)
+    {
+        $result = "";
+        foreach ($collection as $value)
+        {
+            $result .= "
+<section id='search_results'>
+<h1>{$value['title']}</h1>
+<form action='movieView' method='POST'>
+<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
+<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
+
+</form>
+</section>";
+        }
+        return $result;
+    }
+
+
+    public function sessionMovies($app)
+    {
+        $session_wrapper = $app->getContainer()->get('SessionWrapper');
+        $values = $session_wrapper->getSessionVar('movie');
+        $movieCollection = $app->getContainer()->get('MovieCollection');
+        foreach ($values as $id)
+        {
+            $result = $this->searchId($app, $id);
+            $movies = $this->searchGenre($app, $result['genre']);
+            if (sizeof($movies) < 6)
+            {
+                $genre = explode(",",$result['genre']);
+                foreach ($genre as $value)
+                {
+                    $movies = $this->searchGenre($app, $value);
+                    $movieCollection->addResults($movies);
+                    $results = $movieCollection->getResults();
+                }
+            }
+        }
+        $movieResults = $this->displayMoviesSession($results);
+        return $movieResults;
+    }
+
+    public function recentReleases($app)
+    {
+        $movieCollection = $app->getContainer()->get('MovieCollection');
+        $this->releaseDate = date("Y-m-d");
+        $query = $app->getContainer()->get('SQLQueries');
+        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
+
+        $db_conf = $app->getContainer()->get('settings');
+        $database_connection_settings = $db_conf['pdo_settings'];
+
+
+        $this->setDatabaseWrapper($database_wrapper);
+        $this->setSQLQueries($query);
+        $this->setDatabaseConnectionSettings($database_connection_settings);
+
+        $this->selectRecentReleases();
+
+        $results = $database_wrapper->getResult();
+        $movieCollection->addResults($results);
+
+        $movieResults = $this->displayRecentMovies($results);
+        return $movieResults;
+    }
+
+    public function mostPopular($app)
+    {
+
+    }
+
+
     /***************************
           Search Functions
      ***************************/
@@ -47,7 +183,7 @@ class MovieManager
     public function searchTitle($app, $tainted_param)
     {
 
-        $this->setTitle($tainted_param['search_movie']);
+        $this->setTitle($tainted_param['search-movie']);
         $query = $app->getContainer()->get('SQLQueries');
         $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
 
@@ -63,26 +199,9 @@ class MovieManager
 
         $rough_result = $database_wrapper->getResult();
 
-        $result = "";
+        $movieResults = $this->displaySearchResults($rough_result);
 
-        foreach ($rough_result as $value)
-        {
-
-            $result .= "
-<fieldset id='search_results'>
-<form action='movieView' method='POST'>
-<h1>{$value['title']}</h1>
-<input type='text' name='film_id' id='film_id' readonly value={$value['film_id']}>
-<br>
-<img src={$value['imageURL']} width='500' height='600'>
-<br>
-<input id='view_btn' type='submit' value='View'>
-</form>
-</fieldset>";
-
-        }
-
-        return $result;
+        return $movieResults;
     }
 
     public function searchId($app, $film_id)
@@ -105,6 +224,28 @@ class MovieManager
 
         return $result;
     }
+
+    public function searchGenre($app, $genre)
+    {
+        $this->genre = "%".$genre."%";;
+        $query = $app->getContainer()->get('SQLQueries');
+        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
+
+        $db_conf = $app->getContainer()->get('settings');
+        $database_connection_settings = $db_conf['pdo_settings'];
+
+
+        $this->setDatabaseWrapper($database_wrapper);
+        $this->setSQLQueries($query);
+        $this->setDatabaseConnectionSettings($database_connection_settings);
+
+        $this->selectMovieGenre();
+
+        $result = $database_wrapper->getResult();
+
+        return $result;
+    }
+
 
     public function getDistinctLocations($app)
     {
@@ -179,23 +320,71 @@ class MovieManager
         $this->max = $tainted_param['max-date'];
         $movieCollection = $app->getContainer()->get('MovieCollection');
 
+        $query = $app->getContainer()->get('SQLQueries');
+        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
+
+        $db_conf = $app->getContainer()->get('settings');
+        $database_connection_settings = $db_conf['pdo_settings'];
+
+
+        $this->setDatabaseWrapper($database_wrapper);
+        $this->setSQLQueries($query);
+        $this->setDatabaseConnectionSettings($database_connection_settings);
+
+        if ($this->genre != '%Any%' && $this->ageRating == 'Any' && $this->min == '' && $this->max == '' && $this->director == '%%' && $this->cast == '%%')
+        {
+            $this->selectMovieGenre();
+            $result = $database_wrapper->getResult();
+            foreach ($result as $value)
+            {
+                $movieCollection->addResult($value);
+            }
+        }
+
+        if ($this->genre == '%Any%' && $this->ageRating != 'Any' && $this->min == '' && $this->max == '' && $this->director == '%%' && $this->cast == '%%')
+        {
+            $this->selectMovieAgeRating();
+            $result = $database_wrapper->getResult();
+            foreach ($result as $value)
+            {
+                $movieCollection->addResult($value);
+            }
+        }
+
+        if ($this->genre == '%Any%' && $this->ageRating == 'Any' && $this->min != '' && $this->max != '' && $this->director == '%%' && $this->cast == '%%')
+        {
+            $this->selectMovieDate();
+            $result = $database_wrapper->getResult();
+            foreach ($result as $value)
+            {
+                $movieCollection->addResult($value);
+            }
+        }
+
+        if ($this->genre == '%Any%' && $this->ageRating == 'Any' && $this->min == '' && $this->max == '' && $this->director != '%%' && $this->cast == '%%')
+        {
+            $this->selectMovieDirector();
+            $result = $database_wrapper->getResult();
+            foreach ($result as $value)
+            {
+                $movieCollection->addResult($value);
+            }
+        }
+
+        if ($this->genre == '%Any%' && $this->ageRating == 'Any' && $this->min == '' && $this->max == '' && $this->director == '%%' && $this->cast != '%%')
+        {
+            $this->selectMovieCast();
+            $result = $database_wrapper->getResult();
+            foreach ($result as $value)
+            {
+                $movieCollection->addResult($value);
+            }
+        }
+
         if ($this->genre != '%Any%' && $this->ageRating != 'Any' && $this->min == '' && $this->max == '' && $this->director == '%%' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGA();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -204,21 +393,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->min != '' && $this->max != '' && $this->ageRating == 'Any' && $this->director == '%%' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGR();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -227,21 +403,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->director != '%%' && $this->ageRating == 'Any' && $this->min == '' && $this->max == '' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGD();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -250,21 +413,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->cast != '%%' && $this->ageRating == 'Any' && $this->min == '' && $this->max == '' && $this->director == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -273,21 +423,8 @@ class MovieManager
 
         if ($this->ageRating != 'Any' && $this->min != '' && $this->max != '' && $this->genre == '%Any%' && $this->director == '%%' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieAR();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -296,21 +433,8 @@ class MovieManager
 
         if ($this->ageRating != 'Any' && $this->director != '%%' && $this->genre == '%Any%' && $this->min == '' && $this->max == '' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieAD();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -319,21 +443,8 @@ class MovieManager
 
         if ($this->ageRating != 'Any' && $this->cast != '%%' && $this->genre == '%Any%' && $this->min == '' && $this->max == '' && $this->director == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieAC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -342,21 +453,8 @@ class MovieManager
 
         if ($this->min != '' && $this->max != '' && $this->director != '%%' && $this->genre == '%Any%' && $this->ageRating == 'Any' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieRD();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -365,21 +463,8 @@ class MovieManager
 
         if ($this->min != '' && $this->max != '' && $this->cast != '%%' && $this->genre == '%Any%' && $this->ageRating == 'Any' && $this->director == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieRC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -388,21 +473,8 @@ class MovieManager
 
         if ($this->director != '%%' && $this->cast != '%%' && $this->genre == '%Any%' && $this->ageRating == 'Any' && $this->min == '' && $this->max == '')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieDC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -411,21 +483,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->ageRating != 'Any' && $this->min != '' && $this->max != ''&& $this->director == '%%' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGAR();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -434,21 +493,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->ageRating != 'Any' && $this->director != '%%' && $this->min == '' && $this->max == '' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGAD();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -458,21 +504,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->ageRating != 'Any' && $this->cast != '%%' && $this->min == '' && $this->max == '' && $this->director == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGAC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -481,21 +514,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->min != '' && $this->max != '' && $this->director != '%%' && $this->ageRating == 'Any' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGRD();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -504,21 +524,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->min != '' && $this->max != '' && $this->cast != '%%' && $this->ageRating == 'Any' && $this->director == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGRC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -527,21 +534,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->director != '%%' && $this->cast != '%%' && $this->ageRating == 'Any' && $this->min == '' && $this->max == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGDC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -550,21 +544,8 @@ class MovieManager
 
         if ($this->ageRating != 'Any' && $this->min != '' && $this->max != '' && $this->director != '%%' && $this->genre == '%Any%' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieARD();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -573,21 +554,8 @@ class MovieManager
 
         if ($this->ageRating != 'Any' && $this->min != '' && $this->max != '' && $this->cast != '%%' && $this->genre == '%Any%' && $this->director == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieARC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -596,21 +564,8 @@ class MovieManager
 
         if ($this->ageRating != 'Any' && $this->director != '%%' && $this->cast != '%%' && $this->genre == '%Any%' && $this->min == '' && $this->max == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieADC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -619,21 +574,8 @@ class MovieManager
 
         if ($this->min != '' && $this->max != '' && $this->director != '%%' && $this->cast != '%%' && $this->genre == '%Any%' && $this->ageRating == 'Any')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieRDC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -642,21 +584,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->ageRating != 'Any' && $this->min != '' && $this->max != '' && $this->director != '%%' && $this->cast == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGARD();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -665,21 +594,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->ageRating != 'Any' && $this->min != '' && $this->max != '' && $this->cast != '%%' && $this->director == '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGARC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -688,21 +604,8 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->min != '' && $this->max != '' && $this->director != '%%' && $this->cast != '%%' && $this->ageRating == 'Any')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGRDC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -711,21 +614,8 @@ class MovieManager
 
         if ($this->ageRating != 'Any' && $this->min != '' && $this->max != '' && $this->director != '%%' && $this->cast != '%%' && $this->genre == '%Any%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieARDC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
@@ -734,33 +624,13 @@ class MovieManager
 
         if ($this->genre != '%Any%' && $this->ageRating != 'Any' && $this->min != '' && $this->max != '' && $this->director != '%%' && $this->cast != '%%')
         {
-            $query = $app->getContainer()->get('SQLQueries');
-            $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-            $db_conf = $app->getContainer()->get('settings');
-            $database_connection_settings = $db_conf['pdo_settings'];
-
-
-            $this->setDatabaseWrapper($database_wrapper);
-            $this->setSQLQueries($query);
-            $this->setDatabaseConnectionSettings($database_connection_settings);
-
             $this->selectMovieGARDC();
-
             $result = $database_wrapper->getResult();
-
             foreach ($result as $value)
             {
                 $movieCollection->addResult($value);
             }
         }
-
-
-
-
-
-
-
 
         return $movieCollection->getResults();
     }
@@ -770,6 +640,15 @@ class MovieManager
     /***************************
         Database Functions
      ***************************/
+    public function selectRecentReleases()
+    {
+        $releaseDate = $this->releaseDate;
+        $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
+        $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
+        $this->DatabaseWrapper->makeDatabaseConnection();
+        $this->DatabaseWrapper->selectRecentRelease($releaseDate);
+    }
+
     public function selectMovieGA()
     {
         $genre = $this->genre;
@@ -1086,40 +965,46 @@ class MovieManager
         $this->DatabaseWrapper->selectMovieId($film_id);
     }
 
-    public function selectMovieDate($min, $max)
+    public function selectMovieDate()
     {
+        $min = $this->min;
+        $max = $this->max;
         $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
         $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
         $this->DatabaseWrapper->makeDatabaseConnection();
         $this->DatabaseWrapper->selectMovieReleaseDate($min, $max);
     }
 
-    public function selectMovieCast($cast)
+    public function selectMovieCast()
     {
+        $cast = $this->cast;
         $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
         $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
         $this->DatabaseWrapper->makeDatabaseConnection();
         $this->DatabaseWrapper->selectMovieCast($cast);
     }
 
-    public function selectMovieDirector($director)
+    public function selectMovieDirector()
     {
+        $director = $this->director;
         $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
         $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
         $this->DatabaseWrapper->makeDatabaseConnection();
         $this->DatabaseWrapper->selectMovieDirector($director);
     }
 
-    public function selectMovieAgeRating($ageRating)
+    public function selectMovieAgeRating()
     {
+        $ageRating = $this->ageRating;
         $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
         $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
         $this->DatabaseWrapper->makeDatabaseConnection();
         $this->DatabaseWrapper->selectMovieAgeRating($ageRating);
     }
 
-    public function selectMovieGenre($genre)
+    public function selectMovieGenre()
     {
+        $genre = $this->genre;
         $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
         $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
         $this->DatabaseWrapper->makeDatabaseConnection();

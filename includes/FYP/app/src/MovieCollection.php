@@ -22,6 +22,12 @@ class MovieCollection
         array_push($this->searchResults, $movie);
     }
 
+    public function addResults($collection)
+    {
+        $this->searchResults = array_merge($this->searchResults,$collection);
+        $this->searchResults = array_unique($this->searchResults, SORT_REGULAR);
+    }
+
     public function getResults()
     {
         return $this->searchResults;

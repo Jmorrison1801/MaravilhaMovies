@@ -1,6 +1,6 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <div>
+    <section id="advance_search_section">
         <form id="advanced_search" action="{{ adv_search }}" method="post">
         <label for="genres">Choose a genre:</label>
         <select name="genre" id="genres">
@@ -37,5 +37,5 @@
             <br>
             <input type="submit" value="Search" id="search_btn">
         </form>
-    </div>
+    </section>
 {% endblock %}

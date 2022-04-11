@@ -16,6 +16,13 @@ $app->map(['post','get'],'/advanceSearch', function (Request $request, Response 
         $values = $account_manager->AccountCheck(true);
     }
 
+    $movies = $session_wrapper->getSessionVar('movie');
+    if($movies != null)
+    {
+        getMovies($app);
+    }
+
+    getRecentMovies($app);
 
     return $this->view->render($response,
         'advanceSearch.html.twig',
@@ -34,3 +41,4 @@ $app->map(['post','get'],'/advanceSearch', function (Request $request, Response 
         ]
     );
 })->setName('advanceSearch');
+
