@@ -73,8 +73,8 @@ class SQLQueries
         $query_string .= "WHERE releaseDate < :releaseDate";
 
         return $query_string;
-
     }
+
 
     /***************************
                  G
@@ -338,14 +338,14 @@ class SQLQueries
     public static function getDistinctVar()
     {
         $query_string = "SELECT DISTINCT location ";
-        $query_string .= "FROM cinema_tbl";
+        $query_string .= "FROM screening_tbl";
 
         return $query_string;
     }
 
     public static function selectShowtimesVar()
     {
-        $query_string = "SELECT * FROM cinema_tbl ";
+        $query_string = "SELECT * FROM screening_tbl ";
         $query_string .= "WHERE film_id = :film_id AND location = :location";
 
         return $query_string;
@@ -354,6 +354,7 @@ class SQLQueries
     public static function selectAllMoviesVar()
     {
         $query_string = "SELECT * FROM films_tbl ";
+        $query_string .= "ORDER BY releaseDate DESC";
 
         return $query_string;
     }

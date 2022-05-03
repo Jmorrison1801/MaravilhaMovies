@@ -2,17 +2,17 @@
 {% block title %}{{ page_title }}{% endblock %}
 {% block banner %}
 <div>
-    <h1>{{ page_heading_1 }}</h1>
-    <hr class="deepline"/>
+    <div class="header">
+        <h1>{{ page_heading_1 }}</h1>
+    </div>
     <nav id="banner-nav">
         <a href="{{ login_button }}">{{ login_value }}</a>
         <a href="{{ homepage }}">Homepage</a>
-        <a href="{{ advance_action }}">Advance Search</a>
-        <a href="#">All Movies</a>
-        <a href="#">About</a>
         <form id="search-title-form" action="{{ search_action }}" method="post">
-            <input placeholder="&#128269; Enter movie title" id="search-title" name="search-movie" type="text" size="30" maxlength="50">
+            <input placeholder="&#128269; Enter movie title" id="search-title" name="search-title" type="text" size="30" maxlength="50">
         </form>
+        <a href="{{ advance_action }}">Advance Search</a>
+        <a href="{{ all_movies }}">All Movies</a>
     </nav>
 </div>
 {% endblock %}

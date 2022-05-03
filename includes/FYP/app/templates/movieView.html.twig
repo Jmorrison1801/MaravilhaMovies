@@ -1,29 +1,21 @@
 {% extends 'banner.html.twig' %}
 {% block content %}
-    <div>
-        <fieldset>
             <section id="movie_details">
-                <h1>{{ title }}</h1>
-                <img id="movie_view_image" src={{ movie_image }} width='500' height='600'>
-                <br>
-                <h2>Genre</h2>
-                <p>{{ genre }}</p>
-                <br>
-                <h3>Cast</h3>
-                <p>{{ cast }}</p>
-                <br>
-                <h4>Director</h4>
-                <p>{{ director }}</p>
-                <br>
-                <h5>Release Date</h5>
-                <p>{{ release_date }}</p>
-                <br>
-                <h5>Age Rating</h5>
-                <p>{{ age_rating }}</p>
+                <div class="left_container">
+                    <img id="movie_view_image" src={{ movie_image }}>
+                </div>
+                <div class="right_container">
+                    <h1>{{ title }}</h1>
+                    <h2>Genre</h2>
+                    <p>{{ genre }}</p>
+                    <h3>Cast</h3>
+                    <p>{{ cast }}</p>
+                    <h4>Director</h4>
+                    <p>{{ director }}</p>
+                    <h5>Release Date</h5>
+                    <p>{{ release_date }}</p>
+                    <h5>Age Rating</h5>
+                    <p>{{ age_rating }}</p>
+                </div>
             </section>
-            <section id="showtimes">
-                {{ showtimes }}
-            </section>
-        </fieldset>
-    </div>
 {% endblock %}

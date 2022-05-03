@@ -34,6 +34,7 @@ $app->map(['post','get'],'/', function (Request $request, Response $response) us
            'login_button' => $values['action'],
            'login_value' => $values['value'],
            'search_action' => 'searchResults',
+           'all_movies' => 'allMovies',
            'advance_action' => 'advanceSearch',
            'page_title' => 'Maravilha Movies',
            'page_heading_1' => 'Maravilha Movies',

@@ -9,6 +9,8 @@ $app->map(['post','get'],'/movieView', function (Request $request, Response $res
     $account_manager = $app->getContainer()->get('AccountManager');
     $session_wrapper = $app->getContainer()->get('SessionWrapper');
     $values = $session_wrapper->getSessionVar('email');
+    $movie_manager = $app->getContainer()->get('MovieManager');
+
 
     if($values == null)
     {
@@ -42,6 +44,7 @@ $app->map(['post','get'],'/movieView', function (Request $request, Response $res
             'login_button' => $values['action'],
             'login_value' => $values['value'],
             'homepage' => $_SERVER["SCRIPT_NAME"],
+            'all_movies' => 'allMovies',
             'search_action' => 'searchResults',
             'movie_view' => 'movieView',
             'advance_action' => 'advanceSearch',
@@ -76,8 +79,8 @@ function getDistinctLocations($app, $tainted_param)
     $movieManager = $app->getContainer()->get('MovieManager');
     $location = $movieManager->getDistinctLocations($app);
     $location_html = "
-<fieldset id='results_locations'>
-<form id='' action='movieView' method='post'>
+<div class='location'>
+<form class='location' action='movieView' method='post'>
 <label for='location'>Change Location: </label>
 <select name='location' id='location'> ";
     foreach ($location as $value){
@@ -88,9 +91,9 @@ function getDistinctLocations($app, $tainted_param)
     $location_html .= "
 </select>
 <input type='text' name='film_id' id='film_id' readonly value={$tainted_param['film_id']}>
-<input type='submit' value='View Showtimes' id='search_btn'>
+<input type='submit' value='View Showtimes' class='input-btn'>
 </form>
-</fieldset>
+</div>
 ";
     print($location_html);
 }
@@ -103,34 +106,104 @@ function getShowtimes($app, $tainted_param)
 
     foreach ($showtimes as $value)
     {
-        $showtimes_value = explode(",",$value['showtimes']);
+        $monday_showtimes = explode(",",$value['monday']);
+        $tuesday_showtimes = explode(",",$value['tuesday']);
+        $wednesday_showtimes = explode(",",$value['wednesday']);
+        $thursday_showtimes = explode(",",$value['thursday']);
+        $friday_showtimes = explode(",",$value['friday']);
+        $saturday_showtimes = explode(",",$value['saturday']);
+        $sunday_showtimes = explode(",",$value['sunday']);
 
         $result .= "
-<fieldset>
-<section id='showtimes'>
-<h1>Showtimes</h1>
-<br>
-<h2>Cinema</h2>
-<br>
+<section class='showtimes'>
+<h1>Cinema</h1>
 <p>{$value['cinema']}</p>
-<br>
 <h2>Location</h2>
-<br>
 <p>{$value['location']}</p>
-<br>
 <h2>Showtimes</h2>
-<br>
+<div class='right_container'>
         ";
 
-        foreach ($showtimes_value as $time)
+
+        $result .= "
+        <div class='showtimes'>
+        <h3>Monday</h3>
+        ";
+        foreach ($monday_showtimes as $time)
         {
             $result .= "
-            <input name='time' id='time' type='button' value='{$time}'>
+            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
             ";
         }
         $result .= "
-</section>
-</fieldset>";
+        </div>
+        <div class='showtimes'>
+        <h3>Tuesday</h3>";
+
+        foreach ($tuesday_showtimes as $time)
+        {
+            $result .= "
+            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
+            ";
+        }
+
+        $result .= "
+        </div>
+        <div class='showtimes'>
+        <h3>Wednesday</h3>";
+        foreach ($wednesday_showtimes as $time)
+        {
+            $result .= "
+            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
+            ";
+        }
+
+        $result .= "
+        </div>
+        <div class='showtimes'>
+        <h3>Thursday</h3>";
+        foreach ($thursday_showtimes as $time)
+        {
+            $result .= "
+            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
+            ";
+        }
+
+        $result .= "
+        </div>
+        <div class='showtimes'>
+        <h3>Friday</h3>";
+        foreach ($friday_showtimes as $time)
+        {
+            $result .= "
+            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
+            ";
+        }
+
+        $result .= "
+        </div>
+        <div class='showtimes'>
+        <h3>Saturday</h3>";
+        foreach ($saturday_showtimes as $time)
+        {
+            $result .= "
+            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
+            ";
+        }
+
+        $result .= "
+        </div>
+        <div class='showtimes'>
+        <h3>Sunday</h3>";
+        foreach ($sunday_showtimes as $time)
+        {
+            $result .= "
+            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
+            ";
+        }
+        $result .= "
+</div>
+</section>";
     }
 
     print($result);
