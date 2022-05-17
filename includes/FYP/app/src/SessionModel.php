@@ -5,6 +5,7 @@ namespace MaravilhaMovies;
 class SessionModel
 {
     private $email;
+    private $accountID;
     private $password;
     private $movie;
     private $session_wrapper;
@@ -25,6 +26,11 @@ class SessionModel
     }
 
     public function __destruct(){ }
+
+    public function setSessionAccountID($accountID)
+    {
+        $this->accountID = $accountID;
+    }
 
     public function setSessionEmail($email)
     {
@@ -70,11 +76,12 @@ class SessionModel
     public function storeDataInSessionFile()
     {
         $store_result = false;
+        $store_result_accountID = $this->session_wrapper_file->setSessionVar('accountID', $this->accountID);
         $store_result_email = $this->session_wrapper_file->setSessionVar('email', $this->email);
         $store_result_password = $this->session_wrapper_file->setSessionVar('password', $this->password);
 
 
-        if ($store_result_email !== false && $store_result_password !== false)	{
+        if ($store_result_email !== false && $store_result_password !== false && $store_result_accountID !== false)	{
             $store_result = true;
         }
         return $store_result;

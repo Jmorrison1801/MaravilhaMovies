@@ -7,7 +7,9 @@ use \Psr\Http\Message\ResponseInterface as Response;
 $app->map(['post','get'],'/loginProcess', function (Request $request, Response $response) use ($app)
 {
     $tainted_param = $request->getParsedBody();
-    $loginError = checkLogin($tainted_param['Enter_Email_Address'], $tainted_param['Enter_Password'], $app);
+    $validator = $app->getContainer()->get("Validator");
+    $cleaned_param = $validator->validateLoginDetails($tainted_param['Enter_Email_Address'], $tainted_param['Enter_Password']);
+    $loginError = checkLogin($cleaned_param['Enter_Email_Address'], $cleaned_param['Enter_Password'],$app);
 
     if ($loginError == true)
     {
@@ -41,6 +43,7 @@ function checkLogin($email, $password, $app)
 
     $result = $database_wrapper->getResult();
 
+
     if ($result == true)
     {
         $login_check = $bcrypt_wrapper->authenticatePassword($password, $result['password']);
@@ -52,6 +55,7 @@ function checkLogin($email, $password, $app)
             $results = $session_model->selectMovieInDatabase($app, $email);
             $session_value = explode(",",$results);
 
+            $session_model->setSessionAccountID($result['AccountID']);
             $session_model->setSessionMovie($session_value);
             $session_model->setSessionEmail($email);
             $session_model->setSessionPassword($password);

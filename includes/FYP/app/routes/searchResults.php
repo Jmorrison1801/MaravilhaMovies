@@ -9,6 +9,7 @@ $app->map(['post','get'],'/searchResults', function (Request $request, Response 
     $session_wrapper = $app->getContainer()->get('SessionWrapper');
     $values = $session_wrapper->getSessionVar('email');
     $movie_manager = $app->getContainer()->get('MovieManager');
+    $validator = $app->getContainer()->get("Validator");
 
     if($values == null)
     {
@@ -18,6 +19,7 @@ $app->map(['post','get'],'/searchResults', function (Request $request, Response 
     }
 
     $tainted_param = $request->getParsedBody();
+
 
     $clean_title = '';
     $clean_cast = '';
@@ -46,10 +48,13 @@ $app->map(['post','get'],'/searchResults', function (Request $request, Response 
     }
     else if (array_key_exists("genre",$tainted_param))
     {
-       $searchResults = advanceSearch($app, $tainted_param);
+        $cleaned_param = $validator->validateAdvSearch($tainted_param);
+        $searchResults = advanceSearch($app, $cleaned_param);
     }
-    else if (array_key_exists("search-title",$tainted_param)){
-        $searchResults = searchTitle($app, $tainted_param);
+    else if (array_key_exists("search-title",$tainted_param))
+    {
+        $cleaned_param = $validator->validateString($tainted_param['search-title']);
+        $searchResults = searchTitle($app, $cleaned_param);
     }
 
 
@@ -89,10 +94,10 @@ function searchTitle($app,$clean_title)
     print ($result);
 }
 
-function advanceSearch($app, $tainted_param)
+function advanceSearch($app, $cleaned_param)
 {
     $movieManager = $app->getContainer()->get('MovieManager');
-    $results = $movieManager->advanceSearch($app, $tainted_param);
+    $results = $movieManager->advanceSearch($app, $cleaned_param);
     $result = $movieManager->displaySearchResults($results);
     if(strlen($result) < 55)
     {

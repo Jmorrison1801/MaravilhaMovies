@@ -13,3 +13,5 @@ require 'routes/searchResults.php';
 require 'routes/movieView.php';
 require 'routes/advanceSearch.php';
 require 'routes/allMovies.php';
+require 'routes/account/deleteAccount.php';
+require 'routes/favourites.php';

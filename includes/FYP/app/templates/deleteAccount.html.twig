@@ -1,0 +1,11 @@
+{% extends 'banner.html.twig' %}
+{% block content %}
+    <div id="page-content-div">
+        <form action="{{ delete_account }}" method="post">
+            <h1>Delete Account</h1>
+            <p>Type "DELETE" to confirm account deletion</p>
+            <input name="delete" type="text" class="account-txt">
+            <input type="submit" class="input-btn" value="confirm delete">
+        </form>
+    </div>
+{% endblock %}

@@ -2,6 +2,10 @@
 {% block content %}
     <section id="filter">
         <h1>Apply Filter:</h1>
+        <form action="movieView" method="post">
+            <label for="showdate">Choose a viewing date:</label>
+            <input class="showdate" name="showdate" onchange="this.form.submit()" type="date" value="sreening date" id="date" placeholder="search term" aria-label="search">
+        </form>
         <form id="advanced_search" action="{{ adv_search }}" method="post">
             <label for="genres">Choose a genre:</label>
             <select class="filter_option" name="genre" id="genres">

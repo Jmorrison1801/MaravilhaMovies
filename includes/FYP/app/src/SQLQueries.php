@@ -14,34 +14,51 @@ class SQLQueries
 
     public static function insertAccountVar()
     {
-        $query_string  = "INSERT INTO customertbl ";
+        $query_string  = "INSERT INTO customer_tbl ";
         $query_string .= "SET email = :email, ";
         $query_string .= "password = :password ";
 
         return $query_string;
     }
 
+    public static function insertFavouriteVar()
+    {
+        $query_string  = "INSERT INTO customer_tbl ";
+        $query_string .= "SET favourites = :favourites, ";
+
+        return $query_string;
+    }
+
     public static function selectAccountVar()
     {
-        $query_string = "SELECT * FROM customertbl ";
+        $query_string = "SELECT * FROM customer_tbl ";
         $query_string .= "WHERE email = :email";
 
         return $query_string;
+    }
 
+
+    public static function deleteAccountVar()
+    {
+        $query_string = "DELETE FROM customer_tbl ";
+        $query_string .= "WHERE AccountID = :AccountID";
+
+        return $query_string;
     }
 
     public static function updateViewedMoviesVar()
     {
-        $query_string = "UPDATE customertbl ";
+        $query_string = "UPDATE customer_tbl ";
         $query_string .= "SET recentlyViewed = :recentlyViewed ";
         $query_string .= "WHERE email = :email";
 
         return $query_string;
     }
 
-    public static function selectViewedMoviesVar()
+    public static function updateFavouritesVar()
     {
-        $query_string = "SELECT * FROM customertbl ";
+        $query_string = "UPDATE customer_tbl ";
+        $query_string .= "SET favourites = :favourites ";
         $query_string .= "WHERE email = :email";
 
         return $query_string;
@@ -343,10 +360,28 @@ class SQLQueries
         return $query_string;
     }
 
-    public static function selectShowtimesVar()
+    public static function getDistinctDatesVar()
+    {
+        $query_string = "SELECT DISTINCT showdate ";
+        $query_string .= "FROM screening_tbl";
+
+        return $query_string;
+    }
+
+    public static function getAllShowdatesVar()
     {
         $query_string = "SELECT * FROM screening_tbl ";
         $query_string .= "WHERE film_id = :film_id AND location = :location";
+
+
+        return $query_string;
+    }
+
+    public static function getShowtimesVar()
+    {
+        $query_string = "SELECT * FROM screening_tbl ";
+        $query_string .= "WHERE film_id = :film_id AND location = :location AND showdate = :showdate";
+
 
         return $query_string;
     }

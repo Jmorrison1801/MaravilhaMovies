@@ -37,15 +37,8 @@ $app->map(['post','get'],'/registerProcess', function (Request $request, Respons
 
         $account_manager->addAccount();
 
-        /*
-        $msg = "Welcome to Maravilha Movies";
 
-        $msg = wordwrap($msg,70);
-
-        mail($AccountEmail, "Maravilha Movies", $msg);
-        */
-
-        return $response->withRedirect($_SERVER["SCRIPT_NAME"]);
+        return $response->withRedirect('login');
 
     }else{
         return $response->withRedirect('register');

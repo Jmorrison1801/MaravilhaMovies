@@ -6,10 +6,13 @@
     <div>
         <ul>
             <li><a href="{{ view_information }}"> View Account Information</a></li>
-            <li><a href="{{ acc_preferences }}"> Account Preferences</a></li>
+            <li><a href="{{ favourites }}"> Favourites</a></li>
         </ul>
         <form action="{{ logout_action }}" method="post">
             <input type="submit" value="Log Out">
+        </form>
+        <form action="{{ delete_account }}" method="post">
+            <input type="submit" value="delete account">
         </form>
     </div>
 {% endblock %}

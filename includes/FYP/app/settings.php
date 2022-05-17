@@ -5,6 +5,7 @@ ini_set('html_errors', 'On');
 
 $app_url = dirname($_SERVER['SCRIPT_NAME']);
 $css_path = $app_url . '/style/style.css';
+
 define('CSS_PATH', $css_path);
 
 $settings = [

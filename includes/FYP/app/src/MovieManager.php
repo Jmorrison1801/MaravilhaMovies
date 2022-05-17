@@ -24,6 +24,7 @@ class MovieManager
     private $location;
     private $genreCollection;
     private $castCollection;
+    private $showdate;
 
     public function setMovie($film_id, $title, $description, $genre,
                              $director, $cast, $ageRating, $releaseDate,
@@ -72,12 +73,15 @@ class MovieManager
             $this->genreCollection = explode(",",$value['genre']);
             $this->castCollection = explode(",",$value['cast']);
 
+
             $result .= "
 <div class='movie_result'>
 <h1>{$value['title']}</h1>
 <form action='movieView' method='POST'>
 <div class='left_container'>
                     <input class='image-search' type='image' id='image' src={$value['imageURL']}>
+                     <h3>Release Date</h3>
+                    <p>{$value['releaseDate']}</p>
 </div>
 <div class='right_container'>
 <input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
@@ -112,9 +116,7 @@ class MovieManager
                     <h3>Age Rating</h3>
                     <nav class='tag-search'>
                     <a class='tag-search' href='searchResults?ageRating={$value['ageRating']}'>{$value['ageRating']}</a>
-                    </nav class='tag-search'>
-                    <h3>Release Date</h3>
-                    <p>{$value['releaseDate']}</p>
+                    </nav>
 </div>
 </div>
 </form>
@@ -123,6 +125,272 @@ class MovieManager
         $result .= "</section>";
         return $result;
     }
+
+    public function displayMoviesSession($collection)
+    {
+        $result = "
+<div class='slide-div-session'>
+<div class='slide-container'>
+<h1>Movies you May Like...</h1>
+";
+        foreach ($collection as $value)
+        {
+            $result .= "
+<form class='slider_form' action='movieView' method='POST'>
+<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
+<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
+</form>
+";
+        }
+        $result .= "
+</div>
+</div>";
+
+        return $result;
+    }
+
+    public function displayRecentMovies($collection)
+    {
+        $result = "
+<div class='slide-div-recent'>
+<div class='slide-container'>
+<h1>Recent Releases...</h1>
+";
+        foreach ($collection as $value)
+        {
+            $result .= "
+<form class='slider_form' action='movieView' method='POST'>
+<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
+<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
+</form>
+";
+        }
+        $result .= "
+</div>
+</div>";
+
+        return $result;
+    }
+
+
+    public function displayMovies($collection)
+    {
+        $result = "
+<section id='movie_collection_display'>
+        ";
+        foreach ($collection as $value)
+        {
+            $result .= "
+<h1>{$value['title']}</h1>
+<form action='movieView' method='POST'>
+<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
+<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
+
+</form>
+";
+        }
+
+        $result .= "
+        </section>";
+        return $result;
+    }
+
+
+    public function sessionMovies($app)
+    {
+        $session_wrapper = $app->getContainer()->get('SessionWrapper');
+        $values = $session_wrapper->getSessionVar('movie');
+        $movieCollection = $app->getContainer()->get('MovieCollection');
+        foreach ($values as $id)
+        {
+            $result = $this->searchId($app, $id);
+
+            $movies = $this->searchGenre($app, $result['genre']);
+            if (sizeof($movies) < 6)
+            {
+                $genre = explode(",",$result['genre']);
+                foreach ($genre as $value)
+                {
+                    $movies = $this->searchGenre($app, $value);
+                    $movieCollection->addResults($movies);
+                    $results = $movieCollection->getResults();
+                }
+            }
+        }
+        $movieResults = $this->displayMoviesSession($results);
+        return $movieResults;
+    }
+
+    public function displayFavourites($collection)
+    {
+        $result = "
+<section id='favourites_collection_display'>
+";
+        foreach ($collection as $value)
+        {
+            $this->genreCollection = explode(",",$value['genre']);
+            $this->castCollection = explode(",",$value['cast']);
+
+
+            $result .= "
+<div class='movie_result'>
+<h1>{$value['title']}</h1>
+<form action='movieView' method='POST'>
+<div class='left_container'>
+                    <input class='image-search' type='image' id='image' src={$value['imageURL']}>
+                     <h3>Release Date</h3>
+                    <p>{$value['releaseDate']}</p>
+                    <h1>{$value[0]}</h1>
+                    <nav class=''>
+                        <a class='tag-search' href='favourites?favourite={$value['film_id']}'>Remove From Favourites</a>
+                    </nav>
+</div>
+<div class='right_container'>
+                    <h3>Genre</h3>
+                    <nav class='tag-search'>   ";
+            foreach ($this->genreCollection as $genre)
+            {
+                $result .= "
+                <a class='tag-search' href='searchResults?genre={$genre}'>$genre</a>
+                ";
+            }
+
+
+            $result .= "
+                    </nav class='tag-search'>
+                    <h3>Cast</h3>
+                    <nav class='tag-search'>";
+
+            foreach ($this->castCollection as $cast)
+            {
+                $result .= "
+                 <a class='tag-search' href='searchResults?cast={$cast}'>$cast</a>
+                ";
+            }
+
+            $result .= "
+                    </nav class='tag-search'>
+                    <h3>Director</h3>
+                    <nav class='tag-search'>
+                    <a class='tag-search' href='searchResults?director={$value['director']}'>{$value['director']}</a>
+                    </nav class='tag-search'>
+                    <h3>Age Rating</h3>
+                    <nav class='tag-search'>
+                    <a class='tag-search' href='searchResults?ageRating={$value['ageRating']}'>{$value['ageRating']}</a>
+                    </nav>
+</div>
+</div>
+</form>
+";
+        }
+        $result .= "</section>";
+        return $result;
+    }
+
+    public function getFavourites($app, $email)
+    {
+        $movieCollection = $app->getContainer()->get('MovieCollection');
+
+        $query = $app->getContainer()->get('SQLQueries');
+
+        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
+        $db_conf = $app->getContainer()->get('settings');
+
+        $database_connection_settings = $db_conf['pdo_settings'];
+        $this->setDatabaseWrapper($database_wrapper);
+        $this->setSQLQueries($query);
+        $this->setDatabaseConnectionSettings($database_connection_settings);
+
+        $this->DatabaseWrapper->setSqlQueries( $this->sql_queries);
+        $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
+        $this->DatabaseWrapper->makeDatabaseConnection();
+
+        $this->DatabaseWrapper->selectAccount($email);
+        $account = $this->DatabaseWrapper->getResult();
+
+        $favourites = explode(',',$account['favourites']);
+
+        foreach ($favourites as $id)
+        {
+            $movies = $this->searchId($app, $id);
+
+            $now = date("Y-m-d");
+            $movieRelease = $movies['releaseDate'];
+
+            $date1 = date_create($now);
+            $date2 = date_create($movieRelease);
+
+            $diff=date_diff($date1,$date2);
+
+            $diff = $diff->format('%R%a days');
+
+            $days = '';
+
+            if ($diff < 0)
+            {
+                $days = 'Currently Showing In Cinemas';
+            } else {
+                $days = 'Days till release: '.$diff;
+            }
+
+            array_push($movies,$days);
+            $movieCollection->addResult($movies);
+            $results = $movieCollection->getResults();
+        }
+        $movieResults = $this->displayFavourites($results);
+
+        return $movieResults;
+    }
+
+    public function recentReleases($app)
+    {
+        $movieCollection = $app->getContainer()->get('MovieCollection');
+        $this->releaseDate = date("Y-m-d");
+        $query = $app->getContainer()->get('SQLQueries');
+        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
+
+        $db_conf = $app->getContainer()->get('settings');
+        $database_connection_settings = $db_conf['pdo_settings'];
+
+
+        $this->setDatabaseWrapper($database_wrapper);
+        $this->setSQLQueries($query);
+        $this->setDatabaseConnectionSettings($database_connection_settings);
+
+        $this->selectRecentReleases();
+
+        $results = $database_wrapper->getResult();
+        $movieCollection->addResults($results);
+
+        $movieResults = $this->displayRecentMovies($results);
+        return $movieResults;
+    }
+
+
+    public function getAllMovies($app)
+    {
+        $query = $app->getContainer()->get('SQLQueries');
+        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
+
+        $db_conf = $app->getContainer()->get('settings');
+        $database_connection_settings = $db_conf['pdo_settings'];
+
+
+        $this->setDatabaseWrapper($database_wrapper);
+        $this->setSQLQueries($query);
+        $this->setDatabaseConnectionSettings($database_connection_settings);
+
+        $this->selectAllMovies();
+
+        $rough_result = $database_wrapper->getResult();
+        $movieResults = $this->displaySearchResults($rough_result);
+        return $movieResults;
+    }
+
+
+    /***************************
+          Search Functions
+     ***************************/
 
     public function searchGenre($app, $genre)
     {
@@ -208,155 +476,10 @@ class MovieManager
         return $result;
     }
 
-
-    public function displayMoviesSession($collection)
-    {
-        $result = "
-<div class='slide-div-session'>
-<div class='slide-container'>
-<h1>Movies you May Like...</h1>
-";
-        foreach ($collection as $value)
-        {
-            $result .= "
-<form class='slider_form' action='movieView' method='POST'>
-<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
-<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
-</form>
-";
-        }
-        $result .= "
-</div>
-</div>";
-
-        return $result;
-    }
-
-    public function displayRecentMovies($collection)
-    {
-        $result = "
-<div class='slide-div-recent'>
-<div class='slide-container'>
-<h1>Recent Releases...</h1>
-";
-        foreach ($collection as $value)
-        {
-            $result .= "
-<form class='slider_form' action='movieView' method='POST'>
-<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
-<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
-</form>
-";
-        }
-        $result .= "
-</div>
-</div>";
-
-        return $result;
-    }
-
-
-    public function displayMovies($collection)
-    {
-        $result = "
-<section id='movie_collection_display'>
-        ";
-        foreach ($collection as $value)
-        {
-            $result .= "
-<h1>{$value['title']}</h1>
-<form action='movieView' method='POST'>
-<input type='image' class='image'src={$value['imageURL']} width='300' height='450'>
-<input type='hidden' name='film_id' id='film_id' readonly value={$value['film_id']}>
-
-</form>
-";
-        }
-
-        $result .= "
-        </section>";
-        return $result;
-    }
-
-
-    public function sessionMovies($app)
-    {
-        $session_wrapper = $app->getContainer()->get('SessionWrapper');
-        $values = $session_wrapper->getSessionVar('movie');
-        $movieCollection = $app->getContainer()->get('MovieCollection');
-        foreach ($values as $id)
-        {
-            $result = $this->searchId($app, $id);
-            $movies = $this->searchGenre($app, $result['genre']);
-            if (sizeof($movies) < 6)
-            {
-                $genre = explode(",",$result['genre']);
-                foreach ($genre as $value)
-                {
-                    $movies = $this->searchGenre($app, $value);
-                    $movieCollection->addResults($movies);
-                    $results = $movieCollection->getResults();
-                }
-            }
-        }
-        $movieResults = $this->displayMoviesSession($results);
-        return $movieResults;
-    }
-
-    public function recentReleases($app)
-    {
-        $movieCollection = $app->getContainer()->get('MovieCollection');
-        $this->releaseDate = date("Y-m-d");
-        $query = $app->getContainer()->get('SQLQueries');
-        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-        $db_conf = $app->getContainer()->get('settings');
-        $database_connection_settings = $db_conf['pdo_settings'];
-
-
-        $this->setDatabaseWrapper($database_wrapper);
-        $this->setSQLQueries($query);
-        $this->setDatabaseConnectionSettings($database_connection_settings);
-
-        $this->selectRecentReleases();
-
-        $results = $database_wrapper->getResult();
-        $movieCollection->addResults($results);
-
-        $movieResults = $this->displayRecentMovies($results);
-        return $movieResults;
-    }
-
-
-    public function getAllMovies($app)
-    {
-        $query = $app->getContainer()->get('SQLQueries');
-        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
-
-        $db_conf = $app->getContainer()->get('settings');
-        $database_connection_settings = $db_conf['pdo_settings'];
-
-
-        $this->setDatabaseWrapper($database_wrapper);
-        $this->setSQLQueries($query);
-        $this->setDatabaseConnectionSettings($database_connection_settings);
-
-        $this->selectAllMovies();
-
-        $rough_result = $database_wrapper->getResult();
-        $movieResults = $this->displaySearchResults($rough_result);
-        return $movieResults;
-    }
-
-
-    /***************************
-          Search Functions
-     ***************************/
-
-    public function searchTitle($app, $tainted_param)
+    public function searchTitle($app, $title)
     {
 
-        $this->setTitle($tainted_param['search-title']);
+        $this->setTitle($title);
         $query = $app->getContainer()->get('SQLQueries');
         $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
 
@@ -419,8 +542,10 @@ class MovieManager
         return $result;
     }
 
-    public function getShowtimes($app, $location, $film_id)
+    public function getAllShowdates($app,$film_id,$location)
     {
+        $this->film_id = $film_id;
+        $this->location = $location;
         $query = $app->getContainer()->get('SQLQueries');
         $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
 
@@ -432,7 +557,31 @@ class MovieManager
         $this->setSQLQueries($query);
         $this->setDatabaseConnectionSettings($database_connection_settings);
 
-        $this->selectShowtimes($location, $film_id);
+        $this->selectAllShowdates();
+
+        $result = $database_wrapper->getResult();
+
+        return $result;
+    }
+
+    public function getShowtimes($app, $location, $film_id, $showdate)
+    {
+        $this->location = $location;
+        $this->film_id = $film_id;
+        $this->showdate = $showdate;
+
+        $query = $app->getContainer()->get('SQLQueries');
+        $database_wrapper = $app->getContainer()->get('DatabaseWrapper');
+
+        $db_conf = $app->getContainer()->get('settings');
+        $database_connection_settings = $db_conf['pdo_settings'];
+
+
+        $this->setDatabaseWrapper($database_wrapper);
+        $this->setSQLQueries($query);
+        $this->setDatabaseConnectionSettings($database_connection_settings);
+
+        $this->selectShowtimes();
 
         $result = $database_wrapper->getResult();
 
@@ -443,14 +592,14 @@ class MovieManager
     /***************************
            ADVANCED SEARCH
      ***************************/
-    public function advanceSearch($app, $tainted_param)
+    public function advanceSearch($app, $cleaned_param)
     {
-        $this->director = "%".$tainted_param['director']."%";
-        $this->cast = "%".$tainted_param['cast']."%";
-        $this->ageRating = $tainted_param['ageRating'];
-        $this->genre = "%".$tainted_param['genre']."%";
-        $this->min = $tainted_param['min-date'];
-        $this->max = $tainted_param['max-date'];
+        $this->director = "%".$cleaned_param['director']."%";
+        $this->cast = "%".$cleaned_param['cast']."%";
+        $this->ageRating = $cleaned_param['ageRating'];
+        $this->genre = "%".$cleaned_param['genre']."%";
+        $this->min = $cleaned_param['min-date'];
+        $this->max = $cleaned_param['max-date'];
         $movieCollection = $app->getContainer()->get('MovieCollection');
 
         $query = $app->getContainer()->get('SQLQueries');
@@ -1153,20 +1302,32 @@ class MovieManager
 
     public function selectDistinctLocation()
     {
-        $title = $this->title;
         $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
         $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
         $this->DatabaseWrapper->makeDatabaseConnection();
         $this->DatabaseWrapper->selectDistinctLocation();
-
     }
 
-    public function selectShowtimes($location, $film_id)
+    public function selectAllShowdates()
     {
+        $film_id = $this->film_id;
+        $location = $this->location;
         $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
         $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
         $this->DatabaseWrapper->makeDatabaseConnection();
-        $this->DatabaseWrapper->selectShowtimes($film_id, $location);
+        $this->DatabaseWrapper->selectAllShowdates($film_id,$location);
+    }
+
+
+    public function selectShowtimes()
+    {
+        $film_id = $this->film_id;
+        $location = $this->location;
+        $showdate = $this->showdate;
+        $this->DatabaseWrapper->setSqlQueries($this->sql_queries);
+        $this->DatabaseWrapper->setDatabaseConnectionSettings($this->database_connection_settings);
+        $this->DatabaseWrapper->makeDatabaseConnection();
+        $this->DatabaseWrapper->selectShowtimes($film_id, $location, $showdate);
     }
 
 

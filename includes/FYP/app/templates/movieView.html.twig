@@ -16,6 +16,11 @@
                     <p>{{ release_date }}</p>
                     <h5>Age Rating</h5>
                     <p>{{ age_rating }}</p>
+                    <nav class=''>
+                        <a class='tag-search' href='{{ favourites_action }}
+                        ?favourite={{ film_id }}&fav_action={{ fav_action }}'>
+                            {{ favourites_value }}</a>
+                    </nav>
                 </div>
             </section>
 {% endblock %}

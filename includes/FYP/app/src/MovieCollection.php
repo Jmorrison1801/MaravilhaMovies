@@ -9,7 +9,8 @@ use phpDocumentor\Reflection\Types\Array_;
 class MovieCollection
 {
     private $showtimesCollection = array();
-    private $searchResults = array();
+    public $searchResults = array();
+    private $favourties = array();
 
 
     public function addMovie($showtime)

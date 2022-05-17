@@ -18,6 +18,8 @@ $app->map(['post','get'],'/login', function (Request $request, Response $respons
             'login_value' => 'Login',
             'homepage' =>  $_SERVER["SCRIPT_NAME"] ,
             'search_action' => 'searchResults',
+            'all_movies' => 'allMovies',
+            'advance_action' => 'advanceSearch',
             'page_title' => 'Maravilha Movies',
             'page_heading_1' => 'Maravilha Movies',
             'page_heading_2' => 'Login',

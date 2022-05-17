@@ -10,7 +10,7 @@ body {
 }
 
 .header {
-    padding: 15px;
+    padding: 12px;
     text-align: center;
     background: #fb8332;
     border-radius: 1em 1em 0 0;
@@ -55,6 +55,11 @@ nav a {
 nav.tag-search {
     margin-left: 0;
     background-color: #ad9078;
+    display:grid;
+    grid-template-columns: 200px 200px;
+    grid-row: auto;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
 }
 
 .tag-search {
@@ -111,6 +116,24 @@ nav a:hover {
     font-weight: 600;
     line-height: 1.25;
     margin-left: 380px;
+    min-height: 3rem;
+    padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+    text-decoration: none;
+    transition: all 250ms;
+    vertical-align: baseline;
+    width: auto;
+}
+
+#favourites_collection_display {
+    display: grid;
+    border-radius: .50rem;
+    font-size: 16px;
+    align-items: center;
+    background-clip: padding-box;
+    background-color: #fb8332;
+    color: #fff;
+    font-weight: 600;
+    line-height: 1.25;
     min-height: 3rem;
     padding: calc(.875rem - 1px) calc(1.5rem - 1px);
     text-decoration: none;
@@ -191,7 +214,6 @@ nav a:hover {
 
 form.location {
     display: flex;
-    border: 3px solid;
     border-radius: .50rem;
     font-size: 16px;
     align-items: center;
@@ -248,7 +270,6 @@ form.location {
     border-radius: .25rem;
     cursor: pointer;
     padding: calc(.875rem - 1px) calc(1.5rem - 1px);
-    outline: none;
     transition: all 250ms;
 }
 
@@ -263,7 +284,6 @@ form.location {
 #location {
     font-size: 16px;
     width: auto;
-    border: 3px solid #fb8332;
     height: auto;
     border-radius: 5px;
     outline: none;
@@ -271,9 +291,14 @@ form.location {
     margin-left: 20px;
 }
 
+div.location {
+    margin: 20px;
+}
+
+
 section.showtimes {
+    margin: 20px;
     display: grid;
-    border: 3px solid;
     border-radius: .50rem;
     font-size: 16px;
     align-items: center;
@@ -282,7 +307,6 @@ section.showtimes {
     color: #fff;
     font-weight: 600;
     line-height: 1.25;
-    margin: 0;
     min-height: 3rem;
     padding: calc(.875rem - 1px) calc(1.5rem - 1px);
     text-decoration: none;
@@ -301,7 +325,6 @@ div.showtimes {
 
 #movie_details {
     display: flex;
-    border: 3px solid;
     border-radius: .50rem;
     font-size: 16px;
     align-items: center;

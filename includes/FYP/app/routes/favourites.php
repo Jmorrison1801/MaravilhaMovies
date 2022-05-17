@@ -1,11 +1,15 @@
 <?php
-
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-$app->map(['post','get'],'/allMovies', function (Request $request, Response $response) use ($app)
+$app->map(['post','get'],'/favourites', function (Request $request, Response $response) use ($app)
 {
 
+    if(isset($_GET['favourite']))
+    {
+        $film_id = $_GET['favourite'];
+        removeFavourite($app, $film_id);
+    }
 
     $account_manager = $app->getContainer()->get('AccountManager');
     $session_wrapper = $app->getContainer()->get('SessionWrapper');
@@ -16,38 +20,39 @@ $app->map(['post','get'],'/allMovies', function (Request $request, Response $res
         $values = $account_manager->AccountCheck(false);
     }else{
         $values = $account_manager->AccountCheck(true);
+
     }
 
-    getAllMovies($app);
+    favourites($app);
 
     return $this->view->render($response,
-        'allMovies.html.twig',
+        'favourites.html.twig',
         [
             'css_path' => CSS_PATH,
             'landing_page' => $_SERVER["SCRIPT_NAME"],
             'login_button' => $values['action'],
             'login_value' => $values['value'],
             'homepage' => $_SERVER["SCRIPT_NAME"],
+            'all_movies' => 'allMovies',
             'search_action' => 'searchResults',
-            'adv_search' => 'searchResults',
             'movie_view' => 'movieView',
             'advance_action' => 'advanceSearch',
+            'favourites_action' => $values['favourites_action'],
+            'favourites_value' => $values['favourites_value'],
             'page_title' => 'Maravilha Movies',
             'page_heading_1' => 'Maravilha Movies',
             'page_heading_2' => 'Search for movie',
             'info_text' => 'Search for movie',
         ]
     );
-})->setName('allMovies');
+})->setName('favourites');
 
-function getAllMovies($app)
+function favourites($app)
 {
-    $movie_manager = $app->getContainer()->get('MovieManager');
-    $result = $movie_manager->getAllMovies($app);
-    print ($result);
+    $session_wrapper = $app->getContainer()->get('SessionWrapper');
+    $email = $session_wrapper->getSessionVar('email');
+    $movieManager = $app->getContainer()->get('MovieManager');
+    $movie = $movieManager->getFavourites($app, $email);
+    print($movie);
 }
 
-function sendNewMessage($app){
-    $messageHandler = $app->getContainer()->get('MessageHandler');
-    $messageHandler -> sendMessage();
-}

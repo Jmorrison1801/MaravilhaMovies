@@ -19,6 +19,8 @@ $app->map(['post','get'],'/viewInformation', function (Request $request, Respons
             'homepage' =>  $_SERVER["SCRIPT_NAME"],
             'search_action' => 'searchResults',
             'email' => $accInfo,
+            'adv_search' => 'searchResults',
+            'all_movies' => 'allMovies',
             'page_title' => 'Maravilha Movies',
             'page_heading_1' => 'Maravilha Movies',
             'page_heading_2' => 'Search for movie',

@@ -95,6 +95,19 @@ class DatabaseWrapper
         $this->safeSingleSelect($query_string, $query_parameters);
     }
 
+
+    public function deleteAccount($accountID)
+    {
+        $query_string = $this->sql_queries->deleteAccountVar();
+
+        $query_parameters = [
+            ':AccountID' => $accountID
+        ];
+
+
+        $this->safeQuery($query_string, $query_parameters);
+    }
+
     public function updateRecentlyViewed($films, $email)
     {
         $query_string = $this->sql_queries->updateViewedMoviesVar();
@@ -107,9 +120,21 @@ class DatabaseWrapper
         $this->safeQuery($query_string, $query_parameters);
     }
 
+    public function updateFavouritesViewed($favourites, $email)
+    {
+        $query_string = $this->sql_queries->updateFavouritesVar();
+
+        $query_parameters = [
+            ':email' => $email,
+            ':favourites' => $favourites
+        ];
+
+        $this->safeQuery($query_string, $query_parameters);
+    }
+
     public function selectRecentlyViewed($email)
     {
-        $query_string = $this->sql_queries->selectViewedMoviesVar();
+        $query_string = $this->sql_queries->selectAccountVar();
 
         $query_parameters = [
             ':email' => $email,
@@ -117,6 +142,8 @@ class DatabaseWrapper
 
         $this->safeMovieSelect($query_string, $query_parameters);
     }
+
+
 
 
     /***************************
@@ -157,6 +184,7 @@ class DatabaseWrapper
 
         $this->safeSingleSelect($query_string, $query_parameters);
     }
+
 
     /***************************
     G
@@ -591,13 +619,26 @@ class DatabaseWrapper
         $this->safeSelect($query_string);
     }
 
-    public function selectShowtimes($film_id, $location)
+    public function selectAllShowdates($film_id,$location)
     {
-        $query_string = $this->sql_queries->selectShowtimesVar();
+        $query_string = $this->sql_queries->getAllShowdatesVar();
 
         $query_parameters = [
             ':film_id' => $film_id,
             ':location' => $location
+        ];
+
+        $this->safeMovieSelect($query_string, $query_parameters);
+    }
+
+    public function selectShowtimes($film_id, $location, $showdate)
+    {
+        $query_string = $this->sql_queries->getShowtimesVar();
+
+        $query_parameters = [
+            ':film_id' => $film_id,
+            ':location' => $location,
+            ':showdate' => $showdate
         ];
 
 

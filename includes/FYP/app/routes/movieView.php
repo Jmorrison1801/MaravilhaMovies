@@ -8,31 +8,59 @@ $app->map(['post','get'],'/movieView', function (Request $request, Response $res
 {
     $account_manager = $app->getContainer()->get('AccountManager');
     $session_wrapper = $app->getContainer()->get('SessionWrapper');
-    $values = $session_wrapper->getSessionVar('email');
-    $movie_manager = $app->getContainer()->get('MovieManager');
+    $account = $session_wrapper->getSessionVar('email');
 
+    $cleaned_param = $request->getParsedBody();
 
-    if($values == null)
+    if(isset($_GET['favourite']))
+    {
+        $cleaned_param['film_id'] = $_GET['favourite'];
+    }
+
+    if($account == null)
     {
         $values = $account_manager->AccountCheck(false);
     }else{
         $values = $account_manager->AccountCheck(true);
+        $msg = $account_manager-> favouriteCheck($cleaned_param['film_id'] ,$app, $account);
+        $values['fav_action'] = $msg['fav_action'];
+        $values['favourites_action'] = $msg['action'];
+        $values['favourites_value'] = $msg['value'];
     }
 
-    $tainted_param = $request->getParsedBody();
-
-    $movie = getDetails($app, $tainted_param);
-
-    getDistinctLocations($app, $tainted_param);
-
-    if (array_key_exists("location",$tainted_param))
+    if(isset($_GET['fav_action']))
     {
-        getShowtimes($app, $tainted_param);
-    }
-    else
-    {
-        addMovieToSession($app,$tainted_param['film_id']);
-        storeSessionInDatabase($app);
+        if($_GET['fav_action'] == 'remove'){
+            $film_id = $_GET['favourite'];
+            removeFavourite($app, $film_id);
+            $msg = $account_manager-> favouriteCheck($cleaned_param['film_id'] ,$app, $account);
+            $values['fav_action'] = $msg['fav_action'];
+            $values['favourites_action'] = $msg['action'];
+            $values['favourites_value'] = $msg['value'];
+            getShowDates($app, $film_id);
+            $movie = getDetails($app, $film_id);
+        }
+        if(isset($_GET['fav_action']))
+        {
+            if($_GET['fav_action'] == 'add'){
+                $film_id = $_GET['favourite'];
+                addTofavourites($app, $film_id);
+                $msg = $account_manager-> favouriteCheck($cleaned_param['film_id'] ,$app, $account);
+                $values['fav_action'] = $msg['fav_action'];
+                $values['favourites_action'] = $msg['action'];
+                $values['favourites_value'] = $msg['value'];
+                getShowDates($app, $film_id);
+                $movie = getDetails($app, $film_id);
+            }
+        }
+    } else {
+        addMovieToSession($app,$cleaned_param['film_id']);
+        $movie = getDetails($app, $cleaned_param['film_id']);
+        getShowDates($app, $cleaned_param['film_id']);
+        if (array_key_exists("location",$cleaned_param))
+        {
+            getShowtimes($app, $cleaned_param);
+        }
     }
 
 
@@ -57,6 +85,9 @@ $app->map(['post','get'],'/movieView', function (Request $request, Response $res
             'age_rating' => $movie['ageRating'],
             'movie_image' => $movie['imageURL'],
             'film_id' => $movie['film_id'],
+            'favourites_action' => $values['favourites_action'] ,
+            'favourites_value' => $values['favourites_value'],
+            'fav_action' => $values['fav_action'],
 
             'page_title' => 'Maravilha Movies',
             'page_heading_1' => 'Maravilha Movies',
@@ -66,15 +97,14 @@ $app->map(['post','get'],'/movieView', function (Request $request, Response $res
     );
 })->setName('movieView');
 
-function getDetails($app, $tainted_param)
+function getDetails($app, $film_id)
 {
     $movieManager = $app->getContainer()->get('MovieManager');
-    $movie = $movieManager->searchId($app, $tainted_param['film_id']);
+    $movie = $movieManager->searchId($app, $film_id);
     return $movie;
 }
 
-
-function getDistinctLocations($app, $tainted_param)
+function getShowDates($app, $film_id)
 {
     $movieManager = $app->getContainer()->get('MovieManager');
     $location = $movieManager->getDistinctLocations($app);
@@ -90,122 +120,52 @@ function getDistinctLocations($app, $tainted_param)
     }
     $location_html .= "
 </select>
-<input type='text' name='film_id' id='film_id' readonly value={$tainted_param['film_id']}>
+<label for='showdate'>Choose a viewing date:</label>
+<input class='showdate'name='showdate' type='date' value='sreening date' id='date' placeholder='search term' aria-label='search'>
+<input type='text' name='film_id' id='film_id' readonly value={$film_id}>
 <input type='submit' value='View Showtimes' class='input-btn'>
 </form>
 </div>
 ";
     print($location_html);
+
 }
 
-function getShowtimes($app, $tainted_param)
+function getShowtimes($app, $cleaned_param)
 {
-    $movieManager = $app->getContainer()->get('MovieManager');
-    $showtimes = $movieManager->getShowtimes($app, $tainted_param['location'], $tainted_param['film_id']);
-    $result = "";
-
-    foreach ($showtimes as $value)
-    {
-        $monday_showtimes = explode(",",$value['monday']);
-        $tuesday_showtimes = explode(",",$value['tuesday']);
-        $wednesday_showtimes = explode(",",$value['wednesday']);
-        $thursday_showtimes = explode(",",$value['thursday']);
-        $friday_showtimes = explode(",",$value['friday']);
-        $saturday_showtimes = explode(",",$value['saturday']);
-        $sunday_showtimes = explode(",",$value['sunday']);
+        $selected_location = $cleaned_param['location'];
+        $film_id = $cleaned_param['film_id'];
+        $showdate = $cleaned_param['showdate'];
+        $movieManager = $app->getContainer()->get('MovieManager');
+        $collection = $movieManager->getShowtimes($app, $selected_location,$film_id, $showdate);
+        $result = "";
+        foreach ($collection as $movie)
+        {
+        $showtimes = explode(",",$movie['showtimes']);
 
         $result .= "
-<section class='showtimes'>
-<h1>Cinema</h1>
-<p>{$value['cinema']}</p>
-<h2>Location</h2>
-<p>{$value['location']}</p>
-<h2>Showtimes</h2>
-<div class='right_container'>
-        ";
-
+    <section class='showtimes'>
+    <h1>{$movie['cinema']}, {$movie['location']}</h1>
+    <h1>Screening Date</h1>
+    <p>{$movie['showdate']}</p>
+    <h2>Showtimes</h2>
+    <div class='right_container'>
+            ";
 
         $result .= "
-        <div class='showtimes'>
-        <h3>Monday</h3>
-        ";
-        foreach ($monday_showtimes as $time)
+            <div class='showtimes'>
+            ";
+        foreach ($showtimes as $time)
         {
             $result .= "
-            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
-            ";
+               <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
+                ";
         }
         $result .= "
-        </div>
-        <div class='showtimes'>
-        <h3>Tuesday</h3>";
-
-        foreach ($tuesday_showtimes as $time)
-        {
-            $result .= "
-            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
-            ";
-        }
-
-        $result .= "
-        </div>
-        <div class='showtimes'>
-        <h3>Wednesday</h3>";
-        foreach ($wednesday_showtimes as $time)
-        {
-            $result .= "
-            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
-            ";
-        }
-
-        $result .= "
-        </div>
-        <div class='showtimes'>
-        <h3>Thursday</h3>";
-        foreach ($thursday_showtimes as $time)
-        {
-            $result .= "
-            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
-            ";
-        }
-
-        $result .= "
-        </div>
-        <div class='showtimes'>
-        <h3>Friday</h3>";
-        foreach ($friday_showtimes as $time)
-        {
-            $result .= "
-            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
-            ";
-        }
-
-        $result .= "
-        </div>
-        <div class='showtimes'>
-        <h3>Saturday</h3>";
-        foreach ($saturday_showtimes as $time)
-        {
-            $result .= "
-            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
-            ";
-        }
-
-        $result .= "
-        </div>
-        <div class='showtimes'>
-        <h3>Sunday</h3>";
-        foreach ($sunday_showtimes as $time)
-        {
-            $result .= "
-            <input name='time' id='time' type='button' value='{$time}' class='input-btn-2'>
-            ";
-        }
-        $result .= "
-</div>
-</section>";
+    </div>
+    </div>
+    </section>";
     }
-
     print($result);
 }
 
@@ -261,4 +221,20 @@ function storeSessionInDatabase($app)
     $films = implode(",",$films);
 
     $session_model->storeMovieInDatabase($app, $email, $films);
+}
+
+function addTofavourites($app, $film_id)
+{
+    $session_wrapper = $app->getContainer()->get('SessionWrapper');
+    $email = $session_wrapper->getSessionVar('email');
+    $acount_manager = $app->getContainer()->get("AccountManager");
+    $acount_manager->addToFavourites($app, $email, $film_id);
+}
+
+function removeFavourite($app, $film_id)
+{
+    $session_wrapper = $app->getContainer()->get('SessionWrapper');
+    $email = $session_wrapper->getSessionVar('email');
+    $acount_manager = $app->getContainer()->get("AccountManager");
+    $acount_manager->removeFavourites($app, $email, $film_id);
 }

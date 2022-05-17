@@ -56,3 +56,13 @@ $container['MovieCollection'] = function($container){
     $model = new \MaravilhaMovies\MovieCollection();
     return $model;
 };
+
+$container['MessageHandler'] = function($container){
+    $model = new \MaravilhaMovies\MessageHandler();
+    return $model;
+};
+
+$container['Validator'] = function($container){
+    $model = new \MaravilhaMovies\Validator();
+    return $model;
+};
