@@ -5,8 +5,15 @@ body {
     background-color: white;
     background-image: url("https://static.vecteezy.com/system/resources/previews/002/217/896/original/cinema-wallpaper-social-media-message-background-vector.jpg");
     background-attachment: fixed;
-    margin-left: 200px;
-    margin-right: 200px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+@media screen and (min-width: 1500px) {
+    body {
+        margin-left: 200px;
+        margin-right: 200px;
+    }
 }
 
 .header {

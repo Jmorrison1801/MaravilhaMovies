@@ -11,14 +11,11 @@ class MovieManager
     private $DatabaseWrapper;
     private $film_id;
     private $title;
-    private $description;
     private $genre;
     private $director;
     private $cast;
     private $ageRating;
     private $releaseDate;
-    private $cinemas;
-    private $metaphone;
     private $min;
     private $max;
     private $location;

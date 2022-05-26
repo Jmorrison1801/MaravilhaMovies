@@ -40,9 +40,7 @@ $app->map(['post','get'],'/movieView', function (Request $request, Response $res
             getShowDates($app, $film_id);
             $movie = getDetails($app, $film_id);
         }
-        if(isset($_GET['fav_action']))
-        {
-            if($_GET['fav_action'] == 'add'){
+        if($_GET['fav_action'] == 'add'){
                 $film_id = $_GET['favourite'];
                 addTofavourites($app, $film_id);
                 $msg = $account_manager-> favouriteCheck($cleaned_param['film_id'] ,$app, $account);
@@ -51,7 +49,6 @@ $app->map(['post','get'],'/movieView', function (Request $request, Response $res
                 $values['favourites_value'] = $msg['value'];
                 getShowDates($app, $film_id);
                 $movie = getDetails($app, $film_id);
-            }
         }
     } else {
         addMovieToSession($app,$cleaned_param['film_id']);

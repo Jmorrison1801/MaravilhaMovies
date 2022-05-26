@@ -7,7 +7,6 @@ class Validator
     private $cleanedEmail;
     private $cleanedPassword;
     private $cleanedLoginDetails;
-    private $cleanedMessageID;
     private $value;
     private $cleaned_adv_search;
 
@@ -24,11 +23,6 @@ class Validator
             'Enter_Password' => $this->cleanedPassword
         ];
         return $this->cleanedLoginDetails;
-    }
-
-    public function cleanMessageID($id){
-        $this->cleanedMessageID = filter_var($id, FILTER_SANITIZE_NUMBER_INT);
-        return $this->cleanedMessageID;
     }
 
     public function validateString($value)

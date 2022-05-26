@@ -108,8 +108,6 @@ class AccountManager
 
         $account = $database_wrapper->getResult();
 
-        if($account['favourites'] != null)
-        {
             $favourites = explode(",",$account['favourites']);
             if(in_array($film_id, $favourites) == true)
             {
@@ -125,7 +123,6 @@ class AccountManager
                     'value' => 'Add film from favourites',
                 ];
             }
-        }
 
         return $msg;
 
