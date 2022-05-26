@@ -120,7 +120,7 @@ class AccountManager
                 $msg = [
                     'action' => 'movieView',
                     'fav_action' => 'add',
-                    'value' => 'Add film from favourites',
+                    'value' => 'Add film To favourites',
                 ];
             }
 
